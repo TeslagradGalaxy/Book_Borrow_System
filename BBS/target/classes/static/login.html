@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书馆借阅系统</title>
+    <h1>图书馆借阅系统</h1>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('images/login/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-container {
+            background-color: #fff;
+            padding: 40px;
+            width: 350px; /* Adjusted width */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        .input-group label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .input-group input {
+            width: 90%;
+            padding: 10px 10px 10px 40px;
+            padding-left: 35px; /* Space for icon */
+            font-size: 13px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .input-group img {
+            position: absolute;
+            left: 3%;
+            top: 68%;
+            transform: translateY(-50%);
+            height: 20px;
+            width: 20px;
+        }
+        .login-button {
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            padding: 10px;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 15px;
+        }
+        .login-button:hover {
+            opacity: 0.9;
+        }
+        .register-link {
+            color: #708090;
+            text-decoration: none;
+            display: block;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        h1 {
+            color: #5f0eab;
+            font-family: Helvetica;
+            font-size: 66px;
+            position: fixed; /* 将标题固定在屏幕上 */
+            top: 0; /* 将标题置于页面顶部 */
+            left: 50%; /* 将标题水平居中 */
+            transform: translateX(-50%); /* 使标题水平居中 */
+            margin-top: 20px; /* 可选：调整标题与顶部的距离 */
+            z-index: 9999; /* 设置标题的层级，确保它在其他内容之上 */
+            /* 下面的样式保持不变 */
+            color: transparent;
+            letter-spacing: -4px;
+            background-image: linear-gradient(to right, rgb(30, 255, 251), rgb(241, 231, 23), rgb(241, 75, 10), rgb(78, 38, 240), rgb(104, 16, 236), rgb(168, 227, 231), rgb(249, 249, 249), transparent);
+            background-size: 200% 100%;
+            background-repeat: no-repeat;
+            -webkit-background-clip: text;
+            background-position-x: 200%;
+            animation: 1.7s fillup cubic-bezier(0.42, 0, 0, 1) 0.8s forwards;
+        }
+        h1::after {
+            content: '图书馆借阅系统';
+            position: absolute;
+            top: 0;
+            left: 0;
+            -webkit-text-stroke: 2px;
+            -webkit-text-stroke-color: transparent;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+            animation: 1.2s fadein ease-in-out forwards;
+        }
+        @keyframes fillup {
+            from {
+                background-position-x: 200%;
+            }
+            to {
+                background-position-x: 0%;
+            }
+        }
+        @keyframes fadein {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>登录</h2>
+    <div class="input-group">
+        <label for="username">用户名</label>
+        <img src="images/login/user.png" alt="User Icon">
+        <input type="text" id="username" placeholder="请输入用户名">
+    </div>
+    <div class="input-group">
+        <label for="password">密码</label>
+        <img src="images/login/password.png" alt="Password Icon">
+        <input type="password" id="password" placeholder="请输入密码">
+    </div>
+    <button class="login-button" onclick="login()">登录</button>
+    <!--<a href="register.html" class="register-link">立即注册</a>-->
+</div>
+<script>
+    function login() {
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+
+        var requestBody = {
+            username: username,
+            password: password
+        };
+
+        fetch('http://localhost:8080/cyh/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        })
+            .then(function(response) {
+                return response.json(); // 假设后端总是返回JSON响应
+            })
+            .then(function(data) {
+                if (data.code === 1) {
+                    // 登录成功，保存token
+                    var token = data.data; // 获取返回的token
+                    localStorage.setItem('token', token); // 将token保存到localStorage
+                    // makeRequest('home.html', 'GET')
+                    window.location.href = 'home.html';
+                } else {
+                    // 登录失败，显示消息
+                    alert('登录失败：' + data.msg);
+                }
+            })
+            .catch(function(error) {
+                console.error('Error during login:', error);
+                alert('登录过程中发生错误。');
+            });
+    }
+
+
+
+</script>
+</body>
+</html>

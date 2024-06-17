@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书馆借阅系统</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>图书馆借阅系统</h1>
+
+<h2>Books</h2>
+<button onclick="findAllBooks()">Show All Books</button>
+<form onsubmit="findBookById(event)">
+    <input type="text" id="findBookId" placeholder="Enter Book ID">
+    <button type="submit">Find Book by ID</button>
+</form>
+<form onsubmit="insertBook(event)">
+    <input type="text" id="bookName" placeholder="Enter Book Name">
+    <input type="text" id="bookAuthor" placeholder="Enter Book Author">
+    <input type="text" id="bookPublishDate" placeholder="Enter Publish Date">
+    <input type="number" id="bookPrice" placeholder="Enter Price">
+    <button type="submit">Insert Book</button>
+</form>
+
+<form onsubmit="deleteBook(event)">
+    <input type="text" id="deleteBookId" placeholder="Enter Book ID">
+    <button type="submit">Delete Book</button>
+</form>
+<form onsubmit="updateBook(event)">
+    <input type="text" id="updateBookData" placeholder="Enter Book Data">
+    <button type="submit">Update Book</button>
+</form>
+
+<h2>Users</h2>
+<form onsubmit="insertUser(event)">
+    <input type="text" id="insertUserData" placeholder="Enter User Data">
+    <button type="submit">Insert User</button>
+</form>
+<form onsubmit="deleteUser(event)">
+    <input type="text" id="deleteUserId" placeholder="Enter User ID">
+    <button type="submit">Delete User</button>
+</form>
+<form onsubmit="showBorrowedBook(event)">
+    <input type="text" id="showBorrowedBook" placeholder="Enter User ID">
+    <button type="submit">showBorrowedBook</button>
+</form>
+<form onsubmit="showHistoryRecord(event)">
+    <input type="text" id="showHistoryRecord" placeholder="Enter User ID">
+    <button type="submit">showHistoryRecord</button>
+</form>
+
+<h2>Borrowing</h2>
+<form onsubmit="borrowBook(event)">
+    <input type="text" id="userIdInput" placeholder="Enter User ID">
+    <input type="text" id="bookIdInput" placeholder="Enter Book ID">
+    <button type="submit">Borrow Book</button>
+</form>
+
+<form onsubmit="returnBook(event)">
+    <input type="text" id="returnBookData" placeholder="Enter Return Data">
+    <button type="submit">Return Book</button>
+</form>
+<div id="bookDetails"></div>
+
+<script>
+    function findAllBooks() {
+        window.location.href = 'findBooks.html';
+        // Implement AJAX call to GET /findAllBook
+    }
+
+    function findBookById(event) {
+        event.preventDefault();
+        var bookId = document.getElementById('findBookId').value; // 获取书籍ID的值
+        var url = 'http://localhost:8080/cyh/books/' + bookId; // 构建URL
+
+        fetch(url) // 发送GET请求到后端
+            .then(function(response) {
+                return response.json(); // 将响应转换为JSON
+            })
+            .then(function(data) {
+                if (data.code === 1 && data.msg === 'success') {
+                    // 检查返回的数据中的code和msg字段
+                    const book = data.data; // 假定找到的书籍在rows数组的第一位
+                    const detailsElement = document.getElementById('bookDetails');
+                    // 创建显示信息的字符串
+                    const bookDetails = `
+							<p>ID: ${book.id}</p>
+							<p>Name: ${book.name}</p>
+							<p>Author: ${book.author}</p>
+							<p>Publish Date: ${new Date(book.publishDate).toLocaleDateString()}</p>
+							<p>Price: $${book.price}</p>
+							<p>Borrowed: ${book.borrowed ? 'Yes' : 'No'}</p>
+						`;
+                    detailsElement.innerHTML = bookDetails; // 更新页面上的bookDetails元素
+                } else {
+                    // 处理错误或未找到书籍的情况
+                    document.getElementById('bookDetails').textContent = 'Book not found or error retrieving details.';
+                }
+            })
+            .catch(function(error) {
+                console.error('Error:', error); // 如果有错误，打印出来
+                document.getElementById('bookDetails').textContent = 'Error fetching book details.';
+            });
+    }
+
+
+
+    function insertBook(event) {
+        event.preventDefault(); // 阻止表单默认提交行为
+
+        // 获取表单中的书籍信息
+        var name = document.getElementById('bookName').value;
+        var author = document.getElementById('bookAuthor').value;
+        var publishDate = document.getElementById('bookPublishDate').value;
+        var price = parseFloat(document.getElementById('bookPrice').value);
+
+        // 构建请求体对象
+        var bookData = {
+            name: name,
+            author: author,
+            publishDate: publishDate,
+            price: price
+        };
+
+        // 发起 POST 请求到后端
+        fetch('http://localhost:8080/cyh/books/insertBook', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bookData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    // 如果请求成功，返回一个成功的提示
+                    alert('Book inserted successfully!');
+                } else {
+                    // 如果请求失败，返回一个错误提示
+                    alert('Failed to insert book.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
+            });
+    }
+
+
+    function deleteBook(event) {
+        event.preventDefault();
+        // Implement AJAX call to DELETE /deleteBook with ID from #deleteBookId
+    }
+
+    function updateBook(event) {
+        event.preventDefault();
+        // Implement AJAX call to PUT /updateBook with data from #updateBookData
+    }
+
+    function insertUser(event) {
+        event.preventDefault();
+        // Implement AJAX call to POST /insertUser with data from #insertUserData
+    }
+
+    function deleteUser(event) {
+        event.preventDefault();
+        // Implement AJAX call to DELETE /deleteUser with ID from #deleteUserId
+    }
+    function showBorrowedBook(event) {
+        event.preventDefault();
+
+    }
+    function showHistoryRecord(event) {
+        event.preventDefault();
+    }
+
+    function borrowBook(event) {
+        event.preventDefault(); // 阻止表单默认提交行为
+
+        // 获取输入框中的用户ID和图书ID
+        var userId = document.getElementById('userIdInput').value;
+        var bookId = document.getElementById('bookIdInput').value;
+
+        // 构建请求的 URL
+        var url = '/cyh/Borrows/insertBorrow?UserId=' + encodeURIComponent(userId) + '&BookId=' + encodeURIComponent(bookId);
+
+        // 发起 GET 请求到后端
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    // 如果请求成功，返回一个成功的提示
+                    alert('Book borrowed successfully!');
+                } else {
+                    // 如果请求失败，返回一个错误提示
+                    alert('Failed to borrow book.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
+            });
+    }
+
+
+
+
+    function returnBook(event) {
+        event.preventDefault();
+        var bookData = document.getElementById('returnBookData').value;
+        var url = 'http://localhost:8080/cyh/Borrows/' + encodeURIComponent(bookData);
+
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    // 如果请求成功，返回一个成功的提示
+                    alert('Book returned successfully!');
+                } else {
+                    // 如果请求失败，返回一个错误提示
+                    alert('Failed to return book.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
+            });
+    }
+</script>
+</body>
+</html>
